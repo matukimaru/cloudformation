@@ -3,8 +3,14 @@
     "prod": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
-        "CidrBlock": "192.168.0.0/16"
+        "CidrBlock": "10.0.0.0/16"
       }
-    }
+    },
+    "test": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.1.0.0/16"
+      }
+    },
   }
 }
