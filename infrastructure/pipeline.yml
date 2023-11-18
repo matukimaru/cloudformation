@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: |
+  Creates a pipeline
+
+Parameters:
+  TemplatePath:
+    Default: infrastructure/infra.yml
+    Type: String
+
+  BucketName:
+    Description: |
+      Provide the name of a bucket to be used by CodePipeline |
+      when it fetches code from github.
+    Type: String
+
+  RepoID:
+    Description: The GitHub Repo ID in the form username/reponame
+    Default: matukimaru/cloudformation
+    Type: String
+
+  ConnectionARN:
+    Description: The ARN of the CodeStar connection to GitHub.
+    Type: String
+
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+
+  MyPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !Ref MyBucket
+      Name: MyInfrastructureCodePipeline
+      RestartExecutionOnUpdate: true
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        # Stage declarations
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              InputArtifacts: []
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: 1
+                Provider: CodeStarSourceConnection
+              OutputArtifacts:
+                - Name: SourceCode
+              Configuration:
+                ConnectionArn: !Ref ConnectionARN
+                FullRepositoryId: !Ref RepoID
+                BranchName: main
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: CloudFormationDeploy
+              ActionTypeId:
+                Owner: AWS
+                Category: Deploy
+                Version: "1"
+                Provider: CloudFormation
+              InputArtifacts:
+                - Name: SourceCode
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn: !GetAtt CloudFormationServiceRole.Arn
+                StackName: MyGithubAutomatedTemplate
+                TemplatePath: !Sub
+                  - "SourceCode::${template_path}"
+                  - template_path: !Ref TemplatePath
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: Allows CodePipeline to call services on your behalf.
+      Policies:
+        - PolicyName: SuperAdminEverything
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+      RoleName: CodePipelineServiceRole
+
+  CloudFormationServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Description: Allows CloudFormation to call services on your behalf.
+      Policies:
+        - PolicyName: SuperAdminEverything
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+      RoleName: CloudFormationServiceRole
