@@ -21,7 +21,7 @@ Resources:
           - 0
           - Fn::GetAZs: !Ref "AWS::Region"
       Tags:
-        - Key: Function
+        - Key: Name
           Value: Development
         - Key: Department
           Value: HumanResources
