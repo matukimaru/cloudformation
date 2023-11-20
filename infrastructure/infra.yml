@@ -52,7 +52,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 10.0.0.0/16
+      # DestinationCidrBlock: 10.0.0.0/16
 
   ProdRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
