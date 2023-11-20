@@ -39,3 +39,23 @@ Resources:
           Value: Production
         - Key: Department
           Value: HumanResources
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DevVpc
+      Tags:
+        - Key: Name
+          Value: PrivateRouteTable
+
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 10.0.0.0/16
+
+  ProdRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+         RouteTableId: !Ref PrivateRouteTable
+         SubnetId: !Ref ProdSubnet
