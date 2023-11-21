@@ -110,6 +110,15 @@ Resources:
         - Key: Name
           Value: TestServer
 
+  TestServerPublicIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref TestServer
+      Tags:
+        - Key: Name
+          Value: TestServerPublicIp
+
   # PrivateRoute1:
   #   Type: AWS::EC2::Route
   #   Properties:
