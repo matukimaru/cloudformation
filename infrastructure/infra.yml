@@ -58,6 +58,31 @@ Resources:
         - Key: Name
           Value: GlobalKeyPair
 
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: MySecurityGroup
+      GroupDescription: |
+        Default security group for EC2 instances
+      VpcId: !Ref DevVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      # SecurityGroupEgress:
+      #   - Security Group Rule
+      Tags:
+        - Key: Name
+          Value: MySecurityGroup
+
+  # MyEC2Instance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     ImageId: ami-0fc5d935ebf8bc3bc
+  #     KeyName: !Ref MyKeyPair
+  #     InstanceType: t2.micro
+
   # PrivateRoute1:
   #   Type: AWS::EC2::Route
   #   Properties:
