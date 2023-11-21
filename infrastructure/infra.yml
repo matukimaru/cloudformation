@@ -107,7 +107,7 @@ Resources:
         - !Ref MySecurityGroup
       SubnetId: !Ref ProdSubnet
       UserData: 
-        Fn::Base64: |
+        Fn::Base64: |  # not working //todo fix.
           #!/bin/bash
           sudo apt update
           sudo apt dist-upgrade -y
