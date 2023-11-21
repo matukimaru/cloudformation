@@ -48,6 +48,16 @@ Resources:
         - Key: Name
           Value: PrivateRouteTable
 
+  MyKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyFormat: pem
+      KeyName: globalkp # Required
+      KeyType: rsa
+      Tags: 
+        - Key: Name
+          Value: GlobalKeyPair
+
   # PrivateRoute1:
   #   Type: AWS::EC2::Route
   #   Properties:
