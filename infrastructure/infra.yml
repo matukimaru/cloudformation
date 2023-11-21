@@ -62,8 +62,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: MySecurityGroup
-      GroupDescription: |
-        Default security group for EC2 instances
+      GroupDescription: Default security group for EC2 instances
       VpcId: !Ref DevVpc
       SecurityGroupIngress:
         - IpProtocol: tcp
