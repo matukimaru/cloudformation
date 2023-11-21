@@ -48,6 +48,18 @@ Resources:
         - Key: Name
           Value: PrivateRouteTable
 
+  MyIgw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: MyIgw
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref DevVpc
+      InternetGatewayId: !Ref MyIgw
+
   MyKeyPair:
     Type: AWS::EC2::KeyPair
     Properties:
@@ -69,18 +81,34 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
       # SecurityGroupEgress:
       #   - Security Group Rule
       Tags:
         - Key: Name
           Value: MySecurityGroup
 
-  # MyEC2Instance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     ImageId: ami-0fc5d935ebf8bc3bc
-  #     KeyName: !Ref MyKeyPair
-  #     InstanceType: t2.micro
+  TestServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0fc5d935ebf8bc3bc
+      KeyName: !Ref MyKeyPair
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      SubnetId: !Ref ProdSubnet
+      UserData: 
+        Fn::Base64: |
+          #!/bin/bash
+          sudo apt update
+          sudo apt dist-upgrade -y
+          sudo apt install apache2 -y
+      Tags:
+        - Key: Name
+          Value: TestServer
 
   # PrivateRoute1:
   #   Type: AWS::EC2::Route
@@ -93,3 +121,8 @@ Resources:
     Properties:
          RouteTableId: !Ref PrivateRouteTable
          SubnetId: !Ref ProdSubnet
+
+Outputs:
+  TestServerPublicIp:
+    Description: Public IP of the test server
+    Value: !GetAtt TestServer.PublicIp
